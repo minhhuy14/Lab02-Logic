@@ -3,22 +3,19 @@ import KB
 
 def read_data_from_file(file_name):
     script_dir=os.path.dirname(os.path.abspath(__file__))
-    cwd=os.getcwd()
     file_path=os.path.join(script_dir,file_name)
     f= open(file_path, 'r')
     
-    data=[]
-
     data=f.read().splitlines()
     
+    alpha=data[0:1]
 
-    statement=data[0]
-
-    alpha_statement=[]
+    statement=[]
    
-    st_clause=statement.split()
-    st_clause=list(filter(lambda x:x!='OR',st_clause))
-    alpha_statement.append(st_clause) 
+    for cnf in alpha:
+        st_clause=cnf.split()
+        st_clause=list(filter(lambda x:x!='OR',st_clause))
+        statement.append(st_clause) 
 
     num_clauses = int(data[1])
     
@@ -30,16 +27,29 @@ def read_data_from_file(file_name):
         clause= cnf.split()
         clause=list(filter(lambda x:x!='OR',clause))
         kb.addClause(clause)
+
     f.close()
     
-    return kb,alpha_statement
+    return kb,statement
 
-print(os.getcwd())
-# Example usage:
 kb,alpha = read_data_from_file("input.txt")
-# print("Statement:", statement)
-# print("CNF Clauses:", cnf_clauses)
+
 print(kb.clauses)
 result,check=kb.PL_Resolution(alpha)
 print(result)
 print(check)
+
+for loop_res in result:
+            print(len(loop_res))
+            for clause in loop_res:
+                string = ''
+                for c in clause:
+                    string += c
+                    if c != clause[-1]:
+                        string += ' OR '
+                print(string)
+                
+if check:
+           print('YES')
+else:
+            print('NO')

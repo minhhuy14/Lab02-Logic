@@ -15,45 +15,16 @@ class KnowledgeBase:
     def setNegativeStatement(self, statement):
         negated_statement = []
 
-        # Duyệt qua từng mệnh đề con trong statement
         for clause in statement:
             negated_clause = []
 
-            # Đảo ngược dấu của mỗi nguyên tử trong mệnh đề con
             for atom in clause:
                 negated_atom = self.setNegativeAtom(atom)
                 negated_clause.append(negated_atom)
 
             negated_statement.append(negated_clause)
 
-        return list(itertools.chain.from_iterable(negated_statement))
-    # def isContainSubClause(self,clause,list_clauses):
-    #     for c in list_clauses:
-    #         if set(c).issubset(set(clause)):
-    #             return True
-    #     return False
-    
-    # def removeSubClause(self,list_clauses):
-    #     result=[]
-    #     for c in list_clauses:
-    #         if not self.isContainSubClause(c,result):
-    #             result.append(c)
-    #     return result
-    def removeSubClauses(self, list_clauses):
-        result = []
-    
-        for clause in list_clauses:
-            is_subclause = False
-        
-            for current_clause in result:
-                if set(clause).issubset(set(current_clause)):
-                    is_subclause = True
-                    break
-                
-            if not is_subclause:
-                result.append(clause)
-
-        return result
+        return negated_statement
     
     def isContainComplementaryPair(self, clause):
         for atom in clause:
@@ -62,9 +33,7 @@ class KnowledgeBase:
         return False
     
     def normalizeClause(self, clause):
-        
         clause=list(dict.fromkeys(clause))
-
         ordered_atoms=[]
 
         for atom in clause:
@@ -124,10 +93,11 @@ class KnowledgeBase:
         for neg_atom in neg_query:
             tempKB.addClause(neg_atom)
         
-        print(tempKB.clauses)
+        print('tempKB ',tempKB.clauses)
         result = []
         while True:
             clause_pairs = list(itertools.combinations(range(len(tempKB.clauses)), 2))
+            print(clause_pairs)
             resolvents = []
             for pair in clause_pairs:
                 resolvent = tempKB.resolve(tempKB.clauses[pair[0]], tempKB.clauses[pair[1]])
@@ -140,9 +110,8 @@ class KnowledgeBase:
 
             if not resolvents:
                 return result, False
-            else:
-                if ['{}'] in resolvents:
-                    return result, True
-                else:
-                    for res in resolvents:
-                        tempKB.addClause(res)
+            if ['{}'] in resolvents:
+                return result, True
+            
+            for res in resolvents:
+                tempKB.addClause(res)
